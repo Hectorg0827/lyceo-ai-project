@@ -1,0 +1,26 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "chrome",
+            "request": "launch",
+            "name": "Launch Chrome against localhost",
+            "url": "http://localhost:5000",
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
+}
+```
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return "Welcome to the API!"
+
+if __name__ == '__main__':
+    app.run(debug=True,port=5000)
+```
