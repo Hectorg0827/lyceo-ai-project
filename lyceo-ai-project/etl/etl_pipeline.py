@@ -4,6 +4,11 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -117,25 +122,33 @@ def plot_engagement_trends(csv_path):
     plt.tight_layout()
     plt.show()
 
-import pandas as pd
-
 def extract_data(file_path):
+    """Extract data from CSV file"""
+    logger.info(f"Extracting data from {file_path}")
     return pd.read_csv(file_path)
 
 def transform_data(student_data, interaction_data):
-    # Example transformation: merging datasets on student ID
+    """Transform and merge student data with interactions"""
+    logger.info("Transforming data")
     merged_data = pd.merge(student_data, interaction_data, on='student_id', how='inner')
     return merged_data
 
 def load_data(transformed_data, database_connection):
-    # Example loading function (pseudo-code)
+    """Load transformed data into database"""
+    logger.info("Loading data into database")
     transformed_data.to_sql('student_engagement', con=database_connection, if_exists='replace', index=False)
 
 def run_etl_pipeline(student_data_path, interaction_data_path, database_connection):
-    student_data = extract_data(student_data_path)
-    interaction_data = extract_data(interaction_data_path)
-    transformed_data = transform_data(student_data, interaction_data)
-    load_data(transformed_data, database_connection)
+    """Main ETL pipeline function"""
+    try:
+        student_data = extract_data(student_data_path)
+        interaction_data = extract_data(interaction_data_path)
+        transformed_data = transform_data(student_data, interaction_data)
+        load_data(transformed_data, database_connection)
+        logger.info("ETL pipeline completed successfully")
+    except Exception as e:
+        logger.error(f"ETL pipeline failed: {str(e)}")
+        raise
 
 if __name__ == "__main__":
     student_data_path = 'data/sample_student_data.csv'
@@ -148,4 +161,3 @@ if __name__ == '__main__':
     plot_engagement_trends(csv_path)
     app.run(debug=True, port=5000)
 
-# The Dockerfile content has been moved to a separate Dockerfile.
