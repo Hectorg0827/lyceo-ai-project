@@ -5,9 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import logging
+from pathlib import Path
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
@@ -122,6 +126,11 @@ def plot_engagement_trends(csv_path):
     plt.tight_layout()
     plt.show()
 
+# Data paths
+DATA_DIR = Path(__file__).parent.parent / 'data'
+STUDENT_DATA = DATA_DIR / 'sample_student_data.csv'
+INTERACTION_DATA = DATA_DIR / 'student_content_interactions.csv'
+
 def extract_data(file_path):
     """Extract data from CSV file"""
     logger.info(f"Extracting data from {file_path}")
@@ -146,15 +155,17 @@ def run_etl_pipeline(student_data_path, interaction_data_path, database_connecti
         transformed_data = transform_data(student_data, interaction_data)
         load_data(transformed_data, database_connection)
         logger.info("ETL pipeline completed successfully")
+        return transformed_data
     except Exception as e:
         logger.error(f"ETL pipeline failed: {str(e)}")
         raise
 
 if __name__ == "__main__":
-    student_data_path = 'data/sample_student_data.csv'
-    interaction_data_path = 'data/student_content_interactions.csv'
-    database_connection = None  # Replace with actual database connection
-    run_etl_pipeline(student_data_path, interaction_data_path, database_connection)
+    try:
+        run_etl_pipeline(STUDENT_DATA, INTERACTION_DATA, None)
+    except Exception as e:
+        logger.error(f"Pipeline execution failed: {str(e)}")
+        exit(1)
 
 if __name__ == '__main__':
     csv_path = 'data/clean_student_data.csv'
